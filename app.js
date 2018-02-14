@@ -78,7 +78,7 @@ var UIController = (function () {
         inputValue: '.add__value',
         inputBtn: '.add__btn',
         incomeContainer: '.income__list',
-        expensesContainer: '.expenses__list'
+        expensesContainer: '.expenses__list',
     }
 
 
@@ -150,6 +150,7 @@ var controller = (function (budgetCntr, UIcntr) {
                 ctrlAddItem();
             }
         });
+        
 
     };
 
@@ -171,7 +172,9 @@ var controller = (function (budgetCntr, UIcntr) {
 
 
 
-    }
+    };
+    
+    
 
     // Initializates the script. 
     return {
