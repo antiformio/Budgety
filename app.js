@@ -4,7 +4,7 @@
 --------                        -------- */
 
 var budgetController = (function () {
-    // FUNCTION CONSTRUCTURE - because we need to instanciate LOTS of expenses and LOTS of incomes objects...
+    // FUNCTION CONSTRUCTOR - because we need to instanciate LOTS of expenses and LOTS of incomes objects...
 
     // Custom data type for EXPENSES
     // expenses will have an id, an description and a value
@@ -59,9 +59,6 @@ var budgetController = (function () {
             data.allItems[type].push(newItem);
             // Return the new created element.
             return newItem;
-        },
-        testing: function() {
-            console.log(data);
         }
     };
 
@@ -79,7 +76,9 @@ var UIController = (function () {
         inputType: '.add__type',
         inputDescription: '.add__description',
         inputValue: '.add__value',
-        inputBtn: '.add__btn'
+        inputBtn: '.add__btn',
+        incomeContainer: '.income__list',
+        expensesContainer: '.expenses__list'
     }
 
 
@@ -93,6 +92,32 @@ var UIController = (function () {
                 description: document.querySelector(DOMstrings.inputDescription).value,
                 value: document.querySelector(DOMstrings.inputValue).value
             };
+        },
+        // Adds items to the list of incomes or expenses
+        addListItem: function(obj, type) {
+            var html, newHTML, element;
+            
+            // Create HTML string with placeholder text (%SOMETHING%)
+            // Replace what we want to exchange with "%SOMETHING%" so its easier to find later
+            if(type === 'inc'){
+                element = DOMstrings.incomeContainer;
+                html = '<div class="item clearfix" id="income-&id&"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+            } else if(type === 'exp'){
+                element = DOMstrings.expensesContainer;
+                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            }
+            
+            
+            // Replace the placeHolder text with some actual data (data received with the obj)
+            newHTML = html.replace('%id%', obj.id);
+            newHTML = newHTML.replace('%description%', obj.description);
+            newHTML = newHTML.replace('%value%', obj.value);
+            
+            
+            // Insert the HTML into the DOM - insertAdjacentHTML (ver website para referencias sobre o uso)
+            // beforeend para inserir antes do fim do container (de expenses ou de incomes...)
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHTML);
+            
         },
         // Returns the DOMstrings variable so other controllers can use it too.
         getDOMstrings: function () {
@@ -128,7 +153,7 @@ var controller = (function (budgetCntr, UIcntr) {
 
     };
 
-
+    
     var ctrlAddItem = function () {
         var input, newItem;
         // TODO : 
@@ -139,6 +164,7 @@ var controller = (function (budgetCntr, UIcntr) {
         newItem = budgetCntr.addItem(input.type, input.description, input.value);
         
         // 3. add the item to the UI
+        UIcntr.addListItem(newItem, input.type);
         
         // 4. calculate the budget
         // 5. display the budget on UI
