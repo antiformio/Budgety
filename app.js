@@ -109,7 +109,6 @@ var budgetController = (function () {
 --------                        --------
 --------    UI Controller       --------
 --------                        -------- */
-
 var UIController = (function () {
 
     // Object for the querySelectors. Easier to refractor if we change the class name on the HTML document
@@ -120,6 +119,10 @@ var UIController = (function () {
         inputBtn: '.add__btn',
         incomeContainer: '.income__list',
         expensesContainer: '.expenses__list',
+        incomeTotal: '.budget__income--value',
+        budgetTotal: '.budget__value',
+        expensesTotal: '.budget__expenses--value',
+        expensesPercentage: '.budget__expenses--percentage'
     }
 
 
@@ -187,6 +190,17 @@ var UIController = (function () {
             fieldsArr[0].focus();
 
         },
+        displayBudget: function (budget) {
+            document.querySelector(DOMstrings.budgetTotal).textContent = budget.budget;
+            document.querySelector(DOMstrings.incomeTotal).textContent = budget.totalIncome;
+            document.querySelector(DOMstrings.expensesTotal).textContent = budget.totalExpenses;
+
+            if (budget.percentage > 0) {
+                document.querySelector(DOMstrings.expensesPercentage).textContent = budget.percentage + '%';
+            } else {
+                document.querySelector(DOMstrings.expensesPercentage).textContent = '--'
+            }
+        },
         // Returns the DOMstrings variable so other controllers can use it too.
         getDOMstrings: function () {
             return DOMstrings;
@@ -230,7 +244,7 @@ var controller = (function (budgetCntr, UIcntr) {
         var budget = budgetCntr.getBudget();
         
         // 3. Display the budget on the UI
-        console.log(budget);
+        UIcntr.displayBudget(budget);
     };
 
     var ctrlAddItem = function () {
@@ -264,6 +278,12 @@ var controller = (function (budgetCntr, UIcntr) {
     // Initializates the script. 
     return {
         init: function () {
+            UIcntr.displayBudget({
+                budget: 0,
+                totalIncome: 0,
+                totalExpenses: 0,
+                percentage: -1
+            });
             setupEventListeners();
         }
     };
