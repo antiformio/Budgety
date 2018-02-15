@@ -2,7 +2,6 @@
 --------                        --------
 --------    Budget Controller   --------
 --------                        -------- */
-
 var budgetController = (function () {
     // FUNCTION CONSTRUCTOR - because we need to instanciate LOTS of expenses and LOTS of incomes objects...
 
@@ -22,6 +21,17 @@ var budgetController = (function () {
     };
 
 
+    var calculateTotal = function (type) {
+        var total = 0;
+
+        data.allItems[type].forEach(function (current) {
+            total += current.value;
+        });
+
+        data.totals[type] = total;
+
+    };
+
     // Object to store all data: an array of expenses and an array of incomes,
     // and a total expenses and total incomes
     var data = {
@@ -32,7 +42,9 @@ var budgetController = (function () {
         totals: {
             exp: 0,
             inc: 0
-        }
+        },
+        budget: 0,
+        percentage: -1
     };
 
     // Public method to allow other modules to add a new item to the data structure
@@ -59,6 +71,35 @@ var budgetController = (function () {
             data.allItems[type].push(newItem);
             // Return the new created element.
             return newItem;
+        },
+
+        calculateBudget: function () {
+
+            // Calculate total income and total expenses
+            calculateTotal('exp');
+            calculateTotal('inc');
+
+            // Calculate a budget (income - expenses)
+            data.budget = data.totals.inc - data.totals.exp;
+
+            // Calculate the percentage of income that was spent alredy
+            // Only does the calculation when the total Income is > 0
+            if (data.totals.inc > 0) {
+                data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+            } else {
+                data.percentage = -1;
+            }
+
+
+        },
+
+        getBudget: function () {
+            return {
+                budget: data.budget,
+                totalIncome: data.totals.inc,
+                totalExpenses: data.totals.exp,
+                percentage: data.percentage
+            };
         }
     };
 
@@ -182,12 +223,14 @@ var controller = (function (budgetCntr, UIcntr) {
     };
 
     var updateBudget = function () {
-
         // 1. calculate the budget
-
+        budgetCntr.calculateBudget();
+        
         // 2. Return the budget
-
+        var budget = budgetCntr.getBudget();
+        
         // 3. Display the budget on the UI
+        console.log(budget);
     };
 
     var ctrlAddItem = function () {
