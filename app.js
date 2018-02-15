@@ -119,6 +119,33 @@ var UIController = (function () {
             document.querySelector(element).insertAdjacentHTML('beforeend', newHTML);
             
         },
+        
+        // Clear the input fields after inserting the item on the specific list
+        clearFields: function() {
+            var fields, fieldsArr;
+            // We need to select the description input field and the value input field, we want to clear them
+            // after insertion.
+            // querySelectorAll returns a list instead of an array. 
+            fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
+            
+            // We need to use the slice method, but slice only acepts arrays and not lists, but we can
+            // acess the Array methods by the prototype, and then use the call and pass the fields list and then
+            // it will return an array!
+            fieldsArr = Array.prototype.slice.call(fields);
+            
+            // Iterate the array and clear every item (description and value in this case)
+            // Current value - value of the array that its currently being processed (in this case, the first
+            //                  will be the input description, and then inputa value)
+            // Index - from ero to array.length -1
+            // Array - entire array
+            fieldsArr.forEach(function(current, index, array) {
+                current.value = "";
+            });
+            
+            // Sets the focus on the first element of the array (volta a por o focus na descrição do item)
+            fieldsArr[0].focus();
+            
+        },
         // Returns the DOMstrings variable so other controllers can use it too.
         getDOMstrings: function () {
             return DOMstrings;
@@ -167,8 +194,11 @@ var controller = (function (budgetCntr, UIcntr) {
         // 3. add the item to the UI
         UIcntr.addListItem(newItem, input.type);
         
-        // 4. calculate the budget
-        // 5. display the budget on UI
+        // 4. clear the fields
+        UIcntr.clearFields();
+        
+        // 5. calculate the budget
+        // 6. display the budget on UI
 
 
 
