@@ -17,7 +17,7 @@ var budgetController = (function () {
     var Income = function (id, description, value) {
         this.id = id;
         this.description = description;
-        this.value = value;
+        this.value = value; 
     };
 
 
@@ -122,7 +122,8 @@ var UIController = (function () {
         incomeTotal: '.budget__income--value',
         budgetTotal: '.budget__value',
         expensesTotal: '.budget__expenses--value',
-        expensesPercentage: '.budget__expenses--percentage'
+        expensesPercentage: '.budget__expenses--percentage',
+        container: '.container'
     }
 
 
@@ -145,10 +146,10 @@ var UIController = (function () {
             // Replace what we want to exchange with "%SOMETHING%" so its easier to find later
             if (type === 'inc') {
                 element = DOMstrings.incomeContainer;
-                html = '<div class="item clearfix" id="income-&id&"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value% €</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value% €</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
             } else if (type === 'exp') {
                 element = DOMstrings.expensesContainer;
-                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value% €</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value% €</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
 
 
@@ -232,6 +233,11 @@ var controller = (function (budgetCntr, UIcntr) {
                 ctrlAddItem();
             }
         });
+        
+        // EVENT DELEGATION-> the eventListener is attached, not to the actual item, but to the class before. 
+        // This will be the element that ALL of the incomes and ALL of the expenses will have in common,
+        //          in this case this element is the "container" line 53 of index.html (Section 6, 81)
+        document.querySelector(DOM.container).addEventListener('click', cntrDeleteItem);
 
 
     };
@@ -261,7 +267,7 @@ var controller = (function (budgetCntr, UIcntr) {
             newItem = budgetCntr.addItem(input.type, input.description, input.value);
 
             // 3. add the item to the UI
-            UIcntr.addListItem(newItem, input.type);
+            UIcntr.addListItem(newItem, input.type); 
 
             // 4. clear the fields
             UIcntr.clearFields();
@@ -271,6 +277,29 @@ var controller = (function (budgetCntr, UIcntr) {
         }
 
 
+    };
+    
+    var cntrDeleteItem = function (event){
+        var itemID, splitID, type, ID;
+        
+        // DOM traversing, we need to acess the parent node of this target, 
+        // so we need to move up (see the index.html)
+        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
+        
+        // Do something only if the ID exists...
+        if(itemID) {
+            // FORMATO DO itemID :
+            // inc-0 inc-1 exp-0 exp-1
+            splitID = itemID.split('-');
+            type = splitID[0];
+            ID = splitID[1];
+            
+            
+            // 1. Delete the item from the data structure
+            // 2. Delete the item from the UI
+            // 3. Update and show the new budget
+        }
+        
     };
 
 
