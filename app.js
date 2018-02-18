@@ -72,6 +72,27 @@ var budgetController = (function () {
             // Return the new created element.
             return newItem;
         },
+        
+        deleteItem: function(type, id) {
+            var index, ids;
+            // Create an array with all the id numbers that we have. (there might not be all of the 
+            //          id's in the array anymore...Some were deleted for example)
+            
+            // Solution: use MAP. it returns a new array. In this case returns a new array with all the ids
+            //                  in that array of expenses/incomes object.
+            ids = data.allItems[type].map(function(current) {
+                return current.id;                      
+            });
+            
+            // Returns the index number of the 'id' in the array 'ids'
+            index = ids.indexOf(id);
+            
+            // Now we just need to delete this index from our data array
+            if (index !== -1){
+                data.allItems[type].splice(index, 1);   // Will start removing objects starting from index, remove one time.
+            }
+            
+        },
 
         calculateBudget: function () {
 
@@ -91,6 +112,10 @@ var budgetController = (function () {
             }
 
 
+        },
+        
+        testing: function () {
+            console.log(data);  
         },
 
         getBudget: function () {
@@ -284,6 +309,7 @@ var controller = (function (budgetCntr, UIcntr) {
         
         // DOM traversing, we need to acess the parent node of this target, 
         // so we need to move up (see the index.html)
+        // this is what we have before the parentNodes bellow : <i class="ion-ios-close-outline"></i>
         itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
         
         // Do something only if the ID exists...
@@ -292,10 +318,13 @@ var controller = (function (budgetCntr, UIcntr) {
             // inc-0 inc-1 exp-0 exp-1
             splitID = itemID.split('-');
             type = splitID[0];
-            ID = splitID[1];
+            ID = parseInt(splitID[1]);
             
             
             // 1. Delete the item from the data structure
+            budgetCntr.deleteItem(type, ID);
+            
+            
             // 2. Delete the item from the UI
             // 3. Update and show the new budget
         }
