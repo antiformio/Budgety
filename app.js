@@ -189,11 +189,23 @@ var UIController = (function () {
             document.querySelector(element).insertAdjacentHTML('beforeend', newHTML);
 
         },
+        
+        deleteListItem: function(selectorID) {
+            // In javascript we cannot simply delete an element, we can only remove a child. So in this case
+            //              we have to go up until the father of the element and then remove childs..
+            // (it's weird, but thats how DOM manipulation works..)
+            
+            var el = document.getElementById(selectorID);
+            el.parentNode.removeChild(el);
+            
+           
+            
+        },
 
         // Clear the input fields after inserting the item on the specific list
         clearFields: function () {
             var fields, fieldsArr;
-            // We need to select the description input field and the value input field, we want to clear them
+            // We need to select the description input field AND the value input field, we want to clear them
             // after insertion.
             // querySelectorAll returns a list instead of an array. 
             fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
@@ -326,7 +338,10 @@ var controller = (function (budgetCntr, UIcntr) {
             
             
             // 2. Delete the item from the UI
+            UIcntr.deleteListItem(itemID);
+            
             // 3. Update and show the new budget
+            updateBudget();
         }
         
     };
