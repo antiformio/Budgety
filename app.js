@@ -17,7 +17,7 @@ var budgetController = (function () {
     var Income = function (id, description, value) {
         this.id = id;
         this.description = description;
-        this.value = value; 
+        this.value = value;
     };
 
 
@@ -72,26 +72,26 @@ var budgetController = (function () {
             // Return the new created element.
             return newItem;
         },
-        
-        deleteItem: function(type, id) {
+
+        deleteItem: function (type, id) {
             var index, ids;
             // Create an array with all the id numbers that we have. (there might not be all of the 
             //          id's in the array anymore...Some were deleted for example)
-            
+
             // Solution: use MAP. it returns a new array. In this case returns a new array with all the ids
             //                  in that array of expenses/incomes object.
-            ids = data.allItems[type].map(function(current) {
-                return current.id;                      
+            ids = data.allItems[type].map(function (current) {
+                return current.id;
             });
-            
+
             // Returns the index number of the 'id' in the array 'ids'
             index = ids.indexOf(id);
-            
+
             // Now we just need to delete this index from our data array
-            if (index !== -1){
-                data.allItems[type].splice(index, 1);   // Will start removing objects starting from index, remove one time.
+            if (index !== -1) {
+                data.allItems[type].splice(index, 1); // Will start removing objects starting from index, remove one time.
             }
-            
+
         },
 
         calculateBudget: function () {
@@ -113,9 +113,9 @@ var budgetController = (function () {
 
 
         },
-        
+
         testing: function () {
-            console.log(data);  
+            console.log(data);
         },
 
         getBudget: function () {
@@ -189,17 +189,17 @@ var UIController = (function () {
             document.querySelector(element).insertAdjacentHTML('beforeend', newHTML);
 
         },
-        
-        deleteListItem: function(selectorID) {
+
+        deleteListItem: function (selectorID) {
             // In javascript we cannot simply delete an element, we can only remove a child. So in this case
             //              we have to go up until the father of the element and then remove childs..
             // (it's weird, but thats how DOM manipulation works..)
-            
+
             var el = document.getElementById(selectorID);
             el.parentNode.removeChild(el);
-            
-           
-            
+
+
+
         },
 
         // Clear the input fields after inserting the item on the specific list
@@ -270,7 +270,7 @@ var controller = (function (budgetCntr, UIcntr) {
                 ctrlAddItem();
             }
         });
-        
+
         // EVENT DELEGATION-> the eventListener is attached, not to the actual item, but to the class before. 
         // This will be the element that ALL of the incomes and ALL of the expenses will have in common,
         //          in this case this element is the "container" line 53 of index.html (Section 6, 81)
@@ -279,13 +279,27 @@ var controller = (function (budgetCntr, UIcntr) {
 
     };
 
+    // Updates the percentages of each expense object, after an income is added
+    //          OR after an income is deleted OR after added / deleted expense object.
+    var updatePercentages = function () {
+
+        //1. Calculate percentages
+        
+
+        //2. Read percentages from the budget controller
+
+
+        //3. Update the UI with the new percentages
+
+    };
+
     var updateBudget = function () {
         // 1. calculate the budget
         budgetCntr.calculateBudget();
-        
+
         // 2. Return the budget
         var budget = budgetCntr.getBudget();
-        
+
         // 3. Display the budget on the UI
         UIcntr.displayBudget(budget);
     };
@@ -304,46 +318,52 @@ var controller = (function (budgetCntr, UIcntr) {
             newItem = budgetCntr.addItem(input.type, input.description, input.value);
 
             // 3. add the item to the UI
-            UIcntr.addListItem(newItem, input.type); 
+            UIcntr.addListItem(newItem, input.type);
 
             // 4. clear the fields
             UIcntr.clearFields();
 
             // 5. Calculate and update Budget
             updateBudget();
+
+            //6. Calculate and update percentages
+            updatePercentages();
         }
 
 
     };
-    
-    var cntrDeleteItem = function (event){
+
+    var cntrDeleteItem = function (event) {
         var itemID, splitID, type, ID;
-        
+
         // DOM traversing, we need to acess the parent node of this target, 
         // so we need to move up (see the index.html)
         // this is what we have before the parentNodes bellow : <i class="ion-ios-close-outline"></i>
         itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
-        
+
         // Do something only if the ID exists...
-        if(itemID) {
+        if (itemID) {
             // FORMATO DO itemID :
             // inc-0 inc-1 exp-0 exp-1
             splitID = itemID.split('-');
             type = splitID[0];
             ID = parseInt(splitID[1]);
-            
-            
+
+
             // 1. Delete the item from the data structure
             budgetCntr.deleteItem(type, ID);
-            
-            
+
+
             // 2. Delete the item from the UI
             UIcntr.deleteListItem(itemID);
-            
+
             // 3. Update and show the new budget
             updateBudget();
+
+            // 4. Calculate and update percentages
+            updatePercentages();
         }
-        
+
     };
 
 
