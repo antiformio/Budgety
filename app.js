@@ -177,7 +177,8 @@ var UIController = (function () {
         budgetTotal: '.budget__value',
         expensesTotal: '.budget__expenses--value',
         expensesPercentage: '.budget__expenses--percentage',
-        container: '.container'
+        container: '.container',
+        itemPercentage: 'item__percentage'
     }
 
 
@@ -267,6 +268,16 @@ var UIController = (function () {
             } else {
                 document.querySelector(DOMstrings.expensesPercentage).textContent = '--'
             }
+        },
+        
+        displayPercentages: function(percentages){
+            
+            // Returns a nodesList.
+            var fields = document.querySelectorAll(DOMstrings.itemPercentage);
+            
+            // We cannot use a forEach on an nodeslist, so we need to do this, in order to acess the array methods
+            // Continua Aqui !!!!!!!!!!
+            
         },
         // Returns the DOMstrings variable so other controllers can use it too.
         getDOMstrings: function () {
