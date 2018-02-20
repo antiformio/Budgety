@@ -178,7 +178,7 @@ var UIController = (function () {
         expensesTotal: '.budget__expenses--value',
         expensesPercentage: '.budget__expenses--percentage',
         container: '.container',
-        itemPercentage: 'item__percentage'
+        itemPercentage: '.item__percentage'
     }
 
 
@@ -272,11 +272,32 @@ var UIController = (function () {
         
         displayPercentages: function(percentages){
             
-            // Returns a nodesList.
+            // Returns a nodesList. See clearFIelds method on this controller.
             var fields = document.querySelectorAll(DOMstrings.itemPercentage);
             
-            // We cannot use a forEach on an nodeslist, so we need to do this, in order to acess the array methods
-            // Continua Aqui !!!!!!!!!!
+            // We cannot use a forEach on an nodeslist, so we are going to create our OWN forEach function but for 
+            //      nodesLists instead of arrays
+            
+            var nodeListForEach = function(list, callback){
+              // Para cada campo de percentagem que veio do html, chama a callback com o elemento e o indice
+                for(var i = 0; i < list.length; i++){
+                    callback(list[i], i);
+                }
+                
+            };
+            
+            // A callback pega no elemento e atribui-lhe um textContent do array das percentagens
+            nodeListForEach(fields, function(current, index) {
+               
+                if(percentages[index] > 0){
+                    current.textContent = percentages[index] + '%';
+                }else {
+                    current.textContent = '---';
+                }
+                
+                
+            });
+            
             
         },
         // Returns the DOMstrings variable so other controllers can use it too.
@@ -331,6 +352,7 @@ var controller = (function (budgetCntr, UIcntr) {
 
         //3. Update the UI with the new percentages
         console.log(percentages);
+        UIcntr.displayPercentages(percentages);
     };
 
     var updateBudget = function () {
