@@ -13,17 +13,17 @@ var budgetController = (function () {
         this.value = value;
         this.percentage = -1;
     };
-    
-    Expense.prototype.calcPercentage = function(totalIncome) {
-        if(totalIncome > 0){
+
+    Expense.prototype.calcPercentage = function (totalIncome) {
+        if (totalIncome > 0) {
             this.percentage = Math.round((this.value / totalIncome) * 100);
-        }else{
+        } else {
             this.percentage = -1;
         }
     };
-    
-    Expense.prototype.getPercentage = function() {
-        return this.percentage;  
+
+    Expense.prototype.getPercentage = function () {
+        return this.percentage;
     };
 
     // Custom data type for INCOMES
@@ -126,19 +126,19 @@ var budgetController = (function () {
 
 
         },
-        
-        calculatePercentages: function() {
-              
-            data.allItems.exp.forEach(function(cur){
+
+        calculatePercentages: function () {
+
+            data.allItems.exp.forEach(function (cur) {
                 cur.calcPercentage(data.totals.inc);
             });
-            
+
         },
-        
-        getPercentages: function() {
-            
-            var perc = data.allItems.exp.map(function(cur){
-               return cur.getPercentage(); 
+
+        getPercentages: function () {
+
+            var perc = data.allItems.exp.map(function (cur) {
+                return cur.getPercentage();
             });
             return perc;
         },
@@ -179,7 +179,34 @@ var UIController = (function () {
         expensesPercentage: '.budget__expenses--percentage',
         container: '.container',
         itemPercentage: '.item__percentage'
-    }
+    };
+
+
+    // Format numbers to have a decimal part, instead of only an integer, and to add a '+' or '-' depending if its an income or expense
+    var formatNumber = function (num, type) {
+        var numSplit, int, dec;
+        /* 
+         + or - before the number
+         exactly 2 decimal points
+         comma separating thousands 
+        */
+        num = Math.abs(num);
+        num = num.toFixed(2); // Adds the decimals. RETURNS A STRING
+
+
+        numSplit = num.split('.'); // Divides the number, the integer from the decimals
+        int = numSplit[0];
+        if (int.length > 3) {
+            // Then its more than a thousand, so we need to add a comma
+            int = int.substr(0, int.length - 3) + ',' + int.substr(int.length - 3, int.length); // Starts reading at 0 and goes until lenght - 3. so for example: 2340, becomes 2,340
+        }
+
+        dec = numSplit[1];
+
+        // Adding the sign and returning the string
+        return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
+
+    };
 
 
     // Returns an object (composed by functions) to access the private variables of the UIController
@@ -211,7 +238,7 @@ var UIController = (function () {
             // Replace the placeHolder text with some actual data (data received with the obj)
             newHTML = html.replace('%id%', obj.id);
             newHTML = newHTML.replace('%description%', obj.description);
-            newHTML = newHTML.replace('%value%', obj.value);
+            newHTML = newHTML.replace('%value%', formatNumber(obj.value, type));
 
 
             // Insert the HTML into the DOM - insertAdjacentHTML (ver website para referencias sobre o uso)
@@ -259,9 +286,12 @@ var UIController = (function () {
 
         },
         displayBudget: function (budget) {
-            document.querySelector(DOMstrings.budgetTotal).textContent = budget.budget;
-            document.querySelector(DOMstrings.incomeTotal).textContent = budget.totalIncome;
-            document.querySelector(DOMstrings.expensesTotal).textContent = budget.totalExpenses;
+            var type;
+            budget.budget > 0 ? type = 'inc' : type = 'exp';
+            
+            document.querySelector(DOMstrings.budgetTotal).textContent = formatNumber (budget.budget, type);
+            document.querySelector(DOMstrings.incomeTotal).textContent = formatNumber(budget.totalIncome,'inc');
+            document.querySelector(DOMstrings.expensesTotal).textContent = formatNumber(budget.totalExpenses,'exp');
 
             if (budget.percentage > 0) {
                 document.querySelector(DOMstrings.expensesPercentage).textContent = budget.percentage + '%';
@@ -269,37 +299,39 @@ var UIController = (function () {
                 document.querySelector(DOMstrings.expensesPercentage).textContent = '--'
             }
         },
-        
-        displayPercentages: function(percentages){
-            
+
+        displayPercentages: function (percentages) {
+
             // Returns a nodesList. See clearFIelds method on this controller.
             var fields = document.querySelectorAll(DOMstrings.itemPercentage);
-            
+
             // We cannot use a forEach on an nodeslist, so we are going to create our OWN forEach function but for 
             //      nodesLists instead of arrays
-            
-            var nodeListForEach = function(list, callback){
-              // Para cada campo de percentagem que veio do html, chama a callback com o elemento e o indice
-                for(var i = 0; i < list.length; i++){
+
+            var nodeListForEach = function (list, callback) {
+                // Para cada campo de percentagem que veio do html, chama a callback com o elemento e o indice
+                for (var i = 0; i < list.length; i++) {
                     callback(list[i], i);
                 }
-                
+
             };
-            
+
             // A callback pega no elemento e atribui-lhe um textContent do array das percentagens
-            nodeListForEach(fields, function(current, index) {
-               
-                if(percentages[index] > 0){
+            nodeListForEach(fields, function (current, index) {
+
+                if (percentages[index] > 0) {
                     current.textContent = percentages[index] + '%';
-                }else {
+                } else {
                     current.textContent = '---';
                 }
-                
-                
+
+
             });
-            
-            
+
+
         },
+
+
         // Returns the DOMstrings variable so other controllers can use it too.
         getDOMstrings: function () {
             return DOMstrings;
