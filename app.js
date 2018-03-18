@@ -209,6 +209,15 @@ var UIController = (function () {
 
     };
 
+    // We cannot use a forEach on an nodeslist, so we are going to create our OWN forEach function but for 
+    //      nodesLists instead of arrays
+    var nodeListForEach = function (list, callback) {
+        // Para cada campo de percentagem que veio do html, chama a callback com o elemento e o indice
+        for (var i = 0; i < list.length; i++) {
+            callback(list[i], i);
+            }
+
+    };
 
     // Returns an object (composed by functions) to access the private variables of the UIController
     return {
@@ -306,17 +315,6 @@ var UIController = (function () {
             // Returns a nodesList. See clearFIelds method on this controller.
             var fields = document.querySelectorAll(DOMstrings.itemPercentage);
 
-            // We cannot use a forEach on an nodeslist, so we are going to create our OWN forEach function but for 
-            //      nodesLists instead of arrays
-
-            var nodeListForEach = function (list, callback) {
-                // Para cada campo de percentagem que veio do html, chama a callback com o elemento e o indice
-                for (var i = 0; i < list.length; i++) {
-                    callback(list[i], i);
-                }
-
-            };
-
             // A callback pega no elemento e atribui-lhe um textContent do array das percentagens
             nodeListForEach(fields, function (current, index) {
 
@@ -344,6 +342,26 @@ var UIController = (function () {
             document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' + year;
             
             
+        },
+        
+        changeType: function(){
+            var fields;
+            
+            // Select all the 3 elements to change color (red - expense, green - income)
+            // Remember that the querySelectorAll returns a nodes list....So to iterate it we need to call
+            //              the function we made in displayPercentages, nodeListForEach .
+            fields = document.querySelectorAll(
+                DOMstrings.inputType + ',' +
+                DOMstrings.inputDescription + ',' +
+                DOMstrings.inputValue
+            );
+            
+             nodeListForEach(fields, function(cur){
+                cur.classList.toggle('red-focus');  // toggle adds the red-focus class when it doesnt exist, and when it does, it removes it.
+             });
+            
+            document.querySelector(DOMstrings.inputBtn).classList.toggle('red');
+          
         },
         
         // Returns the DOMstrings variable so other controllers can use it too.
@@ -382,6 +400,11 @@ var controller = (function (budgetCntr, UIcntr) {
         // This will be the element that ALL of the incomes and ALL of the expenses will have in common,
         //          in this case this element is the "container" line 53 of index.html (Section 6, 81)
         document.querySelector(DOM.container).addEventListener('click', cntrDeleteItem);
+        
+        
+        // Change the color of the input box to red or green depending if its an expense or an income. Event listener
+        //      added to the '+' / '-' selector
+        document.querySelector(DOM.inputType).addEventListener('change', UIcntr.changeType);
 
 
     };
@@ -397,7 +420,6 @@ var controller = (function (budgetCntr, UIcntr) {
         var percentages = budgetCntr.getPercentages();
 
         //3. Update the UI with the new percentages
-        console.log(percentages);
         UIcntr.displayPercentages(percentages);
     };
 
