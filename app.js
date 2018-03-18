@@ -178,7 +178,8 @@ var UIController = (function () {
         expensesTotal: '.budget__expenses--value',
         expensesPercentage: '.budget__expenses--percentage',
         container: '.container',
-        itemPercentage: '.item__percentage'
+        itemPercentage: '.item__percentage',
+        dateLabel: '.budget__title--month'
     };
 
 
@@ -330,8 +331,21 @@ var UIController = (function () {
 
 
         },
-
-
+        
+        // Displays the current month
+        displayMonth: function(){
+            var now, year, month, months;
+            
+            months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            now = new Date(); // Sem parametros retorna o dia de hoje
+            year = now.getFullYear();
+            month = now.getMonth();
+            
+            document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' + year;
+            
+            
+        },
+        
         // Returns the DOMstrings variable so other controllers can use it too.
         getDOMstrings: function () {
             return DOMstrings;
@@ -465,6 +479,7 @@ var controller = (function (budgetCntr, UIcntr) {
     // Initializates the script. 
     return {
         init: function () {
+            UIcntr.displayMonth();
             UIcntr.displayBudget({
                 budget: 0,
                 totalIncome: 0,
